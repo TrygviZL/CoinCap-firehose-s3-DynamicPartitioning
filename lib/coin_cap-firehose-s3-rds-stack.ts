@@ -87,6 +87,9 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
 
     const lambdaToFirehoseRole = new iam.Role(this, 'lambdaToFirehoseRole', {
       assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaBasicExecutionRole')
+      ]
     })
 
     // verbose role which allows iot-core to write to kinesis firehose delivery stream
@@ -100,6 +103,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     })
   
     lambdaToFirehosePolicy.attachToRole(lambdaToFirehoseRole)
+  
 
     const fetchData = new lambdanodejs.NodejsFunction(this, 'fetchData',{
       runtime: lambda.Runtime.NODEJS_14_X,
