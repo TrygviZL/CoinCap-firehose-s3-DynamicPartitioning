@@ -37,6 +37,8 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
         }),
       ],
     })
+    
+    deliveryStreamPolicy.attachToRole(deliveryStreamRole)
 
     const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStream', {
       deliveryStreamName: 'coinCapDeliveryStream',
@@ -81,11 +83,28 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       },
     })
 
+    const lambdaToFirehoseRole = new iam.Role(this, 'lambdaToFirehoseRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+    })
+
+    // verbose role which allows iot-core to write to kinesis firehose delivery stream
+    const lambdaToFirehosePolicy = new iam.Policy(this, 'lambdaToFirehosePolicy', {
+      statements: [new iam.PolicyStatement({
+        actions: [
+          'firehose:PutRecord',
+        ],
+        resources: [coinCapDeliveryStream.attrArn],
+      })], 
+    })
+  
+    lambdaToFirehosePolicy.attachToRole(lambdaToFirehoseRole)
+
     const fetchProcessData = new lambdanodejs.NodejsFunction(this, 'fetchData',{
       runtime: lambda.Runtime.NODEJS_14_X,
       environment: {
         DELIVERYSTREAM_NAME: coinCapDeliveryStream.deliveryStreamName!
-      }
+      },
+      role: lambdaToFirehoseRole
     })
 
   }
