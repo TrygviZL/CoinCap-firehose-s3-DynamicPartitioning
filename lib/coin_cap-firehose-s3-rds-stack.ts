@@ -49,7 +49,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
         prefix: 'exchange=!{partitionKeyFromQuery:exchange}/!{timestamp:yyyy/MM/dd}/',
         errorOutputPrefix: 'error/!{firehose:error-output-type}/',
         bufferingHints: {
-          intervalInSeconds: 60,
+          intervalInSeconds: 900,
         },
         dynamicPartitioningConfiguration: {
           enabled: true,
@@ -143,7 +143,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
 
     new glue.CfnTrigger(this, 'glueTrigger', {
       name: 'glueCrawlerTrigger',
-      schedule: 'cron(15 * * * * ?)',
+      schedule: 'cron(15 * * * ? *)',
       type: 'SCHEDULED',
       actions: [{
         crawlerName: 'rawCrawler-HfQuVh9toKnP'
