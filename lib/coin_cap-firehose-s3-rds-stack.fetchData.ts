@@ -53,7 +53,7 @@ const options = {
   path: '/v2/exchanges/',
   method: 'GET',
   headers: {
-    'Authorization': process.env.API_KEY,
+    'Authorization': 'Bearer' + process.env.API_KEY,
   },
 }
 
