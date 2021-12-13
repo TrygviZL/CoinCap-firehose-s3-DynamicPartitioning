@@ -117,9 +117,28 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     })
     eventRule.addTarget(new targets.LambdaFunction(fetchData))
 
-    // Raw Database
     const rawDatabase = new glue.Database(this, 'SAPDatabase', {
       databaseName: 'raw',
+    })
+
+    const rawdb = new glue.Database(this, 'coinCapRaw', {
+      databaseName: 'coincapraw',
+    });
+    
+    const crawlerRole = new iam.Role(this, 'crawlerRole', {
+      assumedBy: new iam.ServicePrincipal('glue.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSGlueServiceRolw'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
+      ],
+    })
+
+    const rawCrawler = new glue.CfnCrawler(this, "rawCrawler", {
+      targets: {
+        s3Targets: [{path: "s3://" + coinCapBucket.bucketName}]
+      },
+      role: crawlerRole.roleArn,
+      databaseName: "coincapraw"
     })
 
   }
