@@ -7,6 +7,7 @@ import * as iam from '@aws-cdk/aws-iam'
 import * as targets from '@aws-cdk/aws-events-targets'
 import * as events from '@aws-cdk/aws-events'
 import * as glue from '@aws-cdk/aws-glue'
+import { createNode } from 'typescript'
 
 export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -140,5 +141,16 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       role: crawlerRole.roleArn,
       databaseName: "coincapraw"
     })
+
+    const glueTrigger = new glue.CfnTrigger(this, 'glueTrigger', {
+      actions: [{
+        crawlerName: rawCrawler.name
+      }],
+      type: 'SCHEDULED',
+      startOnCreation: true,
+      schedule: '(*/15 * * * *)', //Cron 15 minutes
+      name: 'glueCrawlerTrigger'
+    })
+
   }
 }
