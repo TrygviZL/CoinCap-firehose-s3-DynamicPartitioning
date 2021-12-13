@@ -1,9 +1,7 @@
 import * as cdk from '@aws-cdk/core'
 import * as s3 from '@aws-cdk/aws-s3'
 import * as lambdanodejs from '@aws-cdk/aws-lambda-nodejs'
-import * as destinations from '@aws-cdk/aws-kinesisfirehose-destinations'
 import * as lambda from '@aws-cdk/aws-lambda'
-import * as kinesis from '@aws-cdk/aws-kinesisfirehose';
 import { CfnDeliveryStream } from '@aws-cdk/aws-kinesisfirehose'
 import * as iam from '@aws-cdk/aws-iam'
 
