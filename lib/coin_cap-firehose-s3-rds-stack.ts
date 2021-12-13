@@ -128,7 +128,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     const crawlerRole = new iam.Role(this, 'crawlerRole', {
       assumedBy: new iam.ServicePrincipal('glue.amazonaws.com'),
       managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSGlueServiceRolw'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSGlueServiceRole'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
       ],
     })
@@ -140,6 +140,5 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       role: crawlerRole.roleArn,
       databaseName: "coincapraw"
     })
-
   }
 }
