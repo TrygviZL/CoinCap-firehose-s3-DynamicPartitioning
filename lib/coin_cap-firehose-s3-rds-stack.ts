@@ -61,7 +61,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
               parameters: [
                 {
                   parameterName: 'MetadataExtractionQuery',
-                  parameterValue: '{Topic: .data.defaultTopic | split("/")[0] | sub("-";"/")}',
+                  parameterValue: '{Topic: .data.id}',
                 },
                 {
                   parameterName: 'JsonParsingEngine',
@@ -99,7 +99,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   
     lambdaToFirehosePolicy.attachToRole(lambdaToFirehoseRole)
 
-    const fetchProcessData = new lambdanodejs.NodejsFunction(this, 'fetchData',{
+    new lambdanodejs.NodejsFunction(this, 'fetchData',{
       runtime: lambda.Runtime.NODEJS_14_X,
       environment: {
         DELIVERYSTREAM_NAME: coinCapDeliveryStream.deliveryStreamName!
