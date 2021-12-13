@@ -1,8 +1,9 @@
 import * as aws from 'aws-sdk'
 import * as https from 'https'
+import * as path from 'path'
+import * as dotenv from "dotenv"
 
-import * as dotenv from "dotenv";
-dotenv.config({ path: __dirname+'../.env' });
+dotenv.config({ path: path.join(__dirname, '../.env' )});
 
 interface httpsoptions {
   hostname: string
@@ -63,6 +64,7 @@ export const handler = async(event:any) => {
     const response = await getApiData(options)
     
     console.log('response:', response)
+    console.log(process.env.API_KEY)
     response.data.forEach(exchange => {
       var params = {
         DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
