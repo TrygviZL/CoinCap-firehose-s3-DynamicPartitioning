@@ -60,24 +60,29 @@ const options = {
 export const handler = async(event: any) => {
   console.log('request:', JSON.stringify(event, undefined, 2))
   
+  var response
   try {
-    const response = await getApiData(options)
-    
+    response = await getApiData(options)
     console.log('response:', response)
-
-    response.data.forEach(exchange => {
-      const params = {
-        DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
-        Record: {
-          Data: exchange,
-        },
-      }
-
-      deliveryStream.putRecord(params)
-    })
-
-  } catch (error) {
-    console.error(error)
+  } catch(error) {
+    console.error('Could not get data from API: ' + error)
+    return
   }
-}
 
+  response.data.forEach(exchange => {
+    const params = {
+      DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
+      Record: {
+        Data: JSON.stringify(exchange),
+      },
+    }
+
+    return deliveryStream.putRecord(params).promise()
+    .then(() => {
+      console.log('Record written to stream')
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  })
+}

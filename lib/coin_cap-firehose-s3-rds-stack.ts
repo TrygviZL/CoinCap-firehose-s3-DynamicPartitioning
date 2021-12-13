@@ -14,8 +14,6 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
 
     const coinCapBucket = new s3.Bucket(this, 'coinCapBucket')
 
-    // We are using Cfn L1 construct for delivery stream, so we need to explicitly define the 
-    // policy and role that firehose can assume to write s3
     const deliveryStreamRole = new iam.Role(this, 'deliveryStreamRole', {
       assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com'),
     })
