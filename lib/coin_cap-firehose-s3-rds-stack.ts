@@ -106,7 +106,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       environment: {
         DELIVERYSTREAM_NAME: coinCapDeliveryStream.deliveryStreamName!
       },
-      role: lambdaToFirehoseRole
+      role: lambdaToFirehoseRole,
     })
 
     const eventRule = new events.Rule(this, 'fetchDataScheduleRule', {

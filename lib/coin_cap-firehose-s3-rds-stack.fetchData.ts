@@ -60,6 +60,7 @@ export const handler = async(event:any) => {
       Data: response.data
     }
   }
+  
   deliveryStream.putRecord(params)
 
   } catch (error) {
