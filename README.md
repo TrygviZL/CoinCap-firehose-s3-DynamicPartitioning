@@ -1,6 +1,5 @@
-# Welcome to your CDK TypeScript project!
-
-This is a blank project for TypeScript development with CDK.
+# CoinCap data meets aws
+Cryptocurrency has been the hot topic of conversation the last few years, especially with the popularity and value of Bitcoin. In this project, I am combining my growing interest in cryptocurrency with aws by creating a small CDK centered around the public data source coincap.io.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 

@@ -4,6 +4,8 @@ import * as lambdanodejs from '@aws-cdk/aws-lambda-nodejs'
 import * as lambda from '@aws-cdk/aws-lambda'
 import { CfnDeliveryStream } from '@aws-cdk/aws-kinesisfirehose'
 import * as iam from '@aws-cdk/aws-iam'
+import * as targets from '@aws-cdk/aws-events-targets'
+import * as events from '@aws-cdk/aws-events'
 
 export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -48,7 +50,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
         prefix: 'Topic=!{partitionKeyFromQuery:Topic}/!{timestamp:yyyy/MM/dd}/',
         errorOutputPrefix: 'error/!{firehose:error-output-type}/',
         bufferingHints: {
-          intervalInSeconds: 30,
+          intervalInSeconds: 60,
         },
         dynamicPartitioningConfiguration: {
           enabled: true,
@@ -99,13 +101,18 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   
     lambdaToFirehosePolicy.attachToRole(lambdaToFirehoseRole)
 
-    new lambdanodejs.NodejsFunction(this, 'fetchData',{
+    const fetchData = new lambdanodejs.NodejsFunction(this, 'fetchData',{
       runtime: lambda.Runtime.NODEJS_14_X,
       environment: {
         DELIVERYSTREAM_NAME: coinCapDeliveryStream.deliveryStreamName!
       },
       role: lambdaToFirehoseRole
     })
+
+    const eventRule = new events.Rule(this, 'fetchDataScheduleRule', {
+      schedule: events.Schedule.cron({ minute: '/1'}),
+    });
+    eventRule.addTarget(new targets.LambdaFunction(fetchData))
 
   }
 }
