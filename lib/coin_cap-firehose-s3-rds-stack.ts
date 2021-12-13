@@ -48,7 +48,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       extendedS3DestinationConfiguration: {
         bucketArn: coinCapBucket.bucketArn,
         roleArn: deliveryStreamRole.roleArn,
-        prefix: 'Topic=!{partitionKeyFromQuery:Topic}/!{timestamp:yyyy/MM/dd}/',
+        prefix: 'exchange=!{partitionKeyFromQuery:exchange}/!{timestamp:yyyy/MM/dd}/',
         errorOutputPrefix: 'error/!{firehose:error-output-type}/',
         bufferingHints: {
           intervalInSeconds: 60,
@@ -64,7 +64,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
               parameters: [
                 {
                   parameterName: 'MetadataExtractionQuery',
-                  parameterValue: '{Topic: .exchangeId}',
+                  parameterValue: '{exchange: .exchangeId}',
                 },
                 {
                   parameterName: 'JsonParsingEngine',

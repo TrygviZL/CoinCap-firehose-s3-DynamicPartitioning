@@ -64,7 +64,7 @@ export const handler = async(event: any) => {
     const response = await getApiData(options)
     
     console.log('response:', response)
-    console.log(process.env.API_KEY)
+
     response.data.forEach(exchange => {
       const params = {
         DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
