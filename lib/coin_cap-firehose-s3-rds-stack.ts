@@ -45,11 +45,6 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStream', {
       deliveryStreamName: 'coinCapDeliveryStream',
       extendedS3DestinationConfiguration: {
-        cloudWatchLoggingOptions: {
-          enabled: true,
-          logGroupName: 'FirehoseLogs',
-          logStreamName: 'coinCapDeliveryStreamLogs',
-        },
         bucketArn: coinCapBucket.bucketArn,
         roleArn: deliveryStreamRole.roleArn,
         prefix: 'Topic=!{partitionKeyFromQuery:Topic}/!{timestamp:yyyy/MM/dd}/',
@@ -68,7 +63,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
               parameters: [
                 {
                   parameterName: 'MetadataExtractionQuery',
-                  parameterValue: '{Topic: .data.id}',
+                  parameterValue: '{Topic: .exchangeId}',
                 },
                 {
                   parameterName: 'JsonParsingEngine',

@@ -1,6 +1,9 @@
 import * as aws from 'aws-sdk'
 import * as https from 'https'
 
+import * as dotenv from "dotenv";
+dotenv.config({ path: __dirname+'../.env' });
+
 interface httpsoptions {
   hostname: string
   path: string
@@ -9,7 +12,7 @@ interface httpsoptions {
 }
 
 interface coinCapResponseSigleId {
-  id: string
+  exchangeId: string
   rank: string
   symbol: string
   name: string
@@ -37,7 +40,7 @@ const getApiData = async(options:httpsoptions): Promise<coinCapResponse> => {
       })
       res.on("end",() => {
         data = Buffer.concat(data).toString()
-        resolve(data)
+        resolve(JSON.parse(data))
       })
     }).end()
   })
@@ -48,23 +51,28 @@ const options = {
   hostname: 'api.coincap.io',
   path: '/v2/exchanges/',
   method: 'GET',
+  headers: {
+    'Authorization': process.env.API_KEY,
+  }
 }
 
 export const handler = async(event:any) => {
   console.log("request:", JSON.stringify(event, undefined, 2));
   
   try {
-  const response = await getApiData(options)
+    const response = await getApiData(options)
+    
+    console.log('response:', response)
+    response.data.forEach(exchange => {
+      var params = {
+        DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
+        Record: {
+          Data: exchange
+        }
+      }
 
-  var params = {
-    DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
-    Record: { 
-      Data: response.data
-    }
-  }
-  
-  console.log(JSON.stringify(response, null, 2))
-  deliveryStream.putRecord(params)
+      deliveryStream.putRecord(params)
+    })
 
   } catch (error) {
     console.error(error)
