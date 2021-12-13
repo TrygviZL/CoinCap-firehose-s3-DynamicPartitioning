@@ -5,6 +5,7 @@ interface httpsoptions {
   hostname: string
   path: string
   method: string
+  protocol: string
 }
 
 interface coinCapResponseSigleId {
@@ -43,7 +44,8 @@ const getApiData = async(options:httpsoptions): Promise<coinCapResponse> => {
 }
 
 const options = {
-  hostname: 'https://api.coincap.io',
+  protocol: 'https:',
+  hostname: 'api.coincap.io',
   path: '/v2/exchanges/',
   method: 'GET',
 }

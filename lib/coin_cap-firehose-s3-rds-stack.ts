@@ -45,6 +45,11 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStream', {
       deliveryStreamName: 'coinCapDeliveryStream',
       extendedS3DestinationConfiguration: {
+        cloudWatchLoggingOptions: {
+          enabled: true,
+          logGroupName: 'FirehoseLogs',
+          logStreamName: 'coinCapDeliveryStreamLogs',
+        },
         bucketArn: coinCapBucket.bucketArn,
         roleArn: deliveryStreamRole.roleArn,
         prefix: 'Topic=!{partitionKeyFromQuery:Topic}/!{timestamp:yyyy/MM/dd}/',
@@ -88,7 +93,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     const lambdaToFirehoseRole = new iam.Role(this, 'lambdaToFirehoseRole', {
       assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambdaBasicExecutionRole')
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
       ]
     })
 
