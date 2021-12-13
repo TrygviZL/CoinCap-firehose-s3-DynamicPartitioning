@@ -1,9 +1,9 @@
 import * as aws from 'aws-sdk'
 import * as https from 'https'
 import * as path from 'path'
-import * as dotenv from "dotenv"
+import * as dotenv from 'dotenv'
 
-dotenv.config({ path: path.join(__dirname, '../.env' )});
+dotenv.config({ path: path.join(__dirname, '../.env' ) })
 
 interface httpsoptions {
   hostname: string
@@ -32,14 +32,14 @@ interface coinCapResponse {
 
 const deliveryStream = new aws.Firehose()
 
-const getApiData = async(options:httpsoptions): Promise<coinCapResponse> => {
+const getApiData = async(options: httpsoptions): Promise<coinCapResponse> => {
   return new Promise((resolve) => {
     https.request(options, res => {
-      let data:any = []
-      res.on("data", chunk => {
+      let data: any = []
+      res.on('data', chunk => {
         data.push(chunk)
       })
-      res.on("end",() => {
+      res.on('end', () => {
         data = Buffer.concat(data).toString()
         resolve(JSON.parse(data))
       })
@@ -54,11 +54,11 @@ const options = {
   method: 'GET',
   headers: {
     'Authorization': process.env.API_KEY,
-  }
+  },
 }
 
-export const handler = async(event:any) => {
-  console.log("request:", JSON.stringify(event, undefined, 2));
+export const handler = async(event: any) => {
+  console.log('request:', JSON.stringify(event, undefined, 2))
   
   try {
     const response = await getApiData(options)
@@ -66,11 +66,11 @@ export const handler = async(event:any) => {
     console.log('response:', response)
     console.log(process.env.API_KEY)
     response.data.forEach(exchange => {
-      var params = {
+      const params = {
         DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
         Record: {
-          Data: exchange
-        }
+          Data: exchange,
+        },
       }
 
       deliveryStream.putRecord(params)

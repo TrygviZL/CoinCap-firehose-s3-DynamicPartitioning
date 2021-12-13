@@ -9,7 +9,7 @@ import * as events from '@aws-cdk/aws-events'
 
 export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+    super(scope, id, props)
 
     const coinCapBucket = new s3.Bucket(this, 'coinCapBucket')
 
@@ -88,8 +88,8 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     const lambdaToFirehoseRole = new iam.Role(this, 'lambdaToFirehoseRole', {
       assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
-      ]
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+      ],
     })
 
     // verbose role which allows iot-core to write to kinesis firehose delivery stream
@@ -105,17 +105,17 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     lambdaToFirehosePolicy.attachToRole(lambdaToFirehoseRole)
   
 
-    const fetchData = new lambdanodejs.NodejsFunction(this, 'fetchData',{
+    const fetchData = new lambdanodejs.NodejsFunction(this, 'fetchData', {
       runtime: lambda.Runtime.NODEJS_14_X,
       environment: {
-        DELIVERYSTREAM_NAME: coinCapDeliveryStream.deliveryStreamName!
+        DELIVERYSTREAM_NAME: coinCapDeliveryStream.deliveryStreamName!,
       },
       role: lambdaToFirehoseRole,
     })
 
     const eventRule = new events.Rule(this, 'fetchDataScheduleRule', {
-      schedule: events.Schedule.cron({ minute: '/1'}),
-    });
+      schedule: events.Schedule.cron({ minute: '/1' }),
+    })
     eventRule.addTarget(new targets.LambdaFunction(fetchData))
 
   }
