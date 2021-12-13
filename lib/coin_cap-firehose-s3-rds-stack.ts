@@ -4,6 +4,8 @@ import * as lambdanodejs from '@aws-cdk/aws-lambda-nodejs'
 import * as destinations from '@aws-cdk/aws-kinesisfirehose-destinations'
 import * as lambda from '@aws-cdk/aws-lambda'
 import * as kinesis from '@aws-cdk/aws-kinesisfirehose';
+import { CfnDeliveryStream } from '@aws-cdk/aws-kinesisfirehose'
+import * as iam from '@aws-cdk/aws-iam'
 
 export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -11,21 +13,80 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
 
     const coinCapBucket = new s3.Bucket(this, 'coinCapBucket')
 
-    const s3destination = new destinations.S3Bucket(coinCapBucket, {
-      dataOutputPrefix: `${id}` + 'data/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/',
-      errorOutputPrefix: `${id}` + 'dataError/!{firehose:error-output-type}/year=!{timestamp:yyyy}/month=!{timestamp:mm}/day=!{timestamp:dd}/',
-      bufferingInterval: cdk.Duration.minutes(5),
-      /*compression: destinations.Compression.SNAPPY*/   
+    // We are using Cfn L1 construct for delivery stream, so we need to explicitly define the 
+    // policy and role that firehose can assume to write s3
+    const deliveryStreamRole = new iam.Role(this, 'deliveryStreamRole', {
+      assumedBy: new iam.ServicePrincipal('firehose.amazonaws.com'),
     })
 
-    const DeliveryStream = new kinesis.DeliveryStream(this, 'coinCapStream', {
-      destinations: [s3destination],
+    const deliveryStreamPolicy = new iam.Policy(this, 'deliveryStreamPolicy', {
+      statements: [
+        new iam.PolicyStatement({
+          actions: [
+            's3:PutObject',
+          ],
+          resources: [
+            coinCapBucket.bucketArn + '/*',
+          ],
+        }),
+        new iam.PolicyStatement({
+          actions: [
+            's3:ListBucket',
+          ],
+          resources: [
+            coinCapBucket.bucketArn,
+          ],
+        }),
+      ],
     })
 
-    const fetchProcessData = new lambdanodejs.NodejsFunction(this, 'DataLambda',{
+    const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStream', {
+      deliveryStreamName: 'coinCapDeliveryStream',
+      extendedS3DestinationConfiguration: {
+        bucketArn: coinCapBucket.bucketArn,
+        roleArn: deliveryStreamRole.roleArn,
+        prefix: 'Topic=!{partitionKeyFromQuery:Topic}/!{timestamp:yyyy/MM/dd}/',
+        errorOutputPrefix: 'error/!{firehose:error-output-type}/',
+        bufferingHints: {
+          intervalInSeconds: 30,
+        },
+        dynamicPartitioningConfiguration: {
+          enabled: true,
+        },
+        processingConfiguration: {
+          enabled: true,
+          processors: [
+            {
+              type: 'MetadataExtraction',
+              parameters: [
+                {
+                  parameterName: 'MetadataExtractionQuery',
+                  parameterValue: '{Topic: .data.defaultTopic | split("/")[0] | sub("-";"/")}',
+                },
+                {
+                  parameterName: 'JsonParsingEngine',
+                  parameterValue: 'JQ-1.6',
+                },
+              ],
+            },
+            {
+              type: 'AppendDelimiterToRecord',
+              parameters: [
+                {
+                  parameterName: 'Delimiter',
+                  parameterValue: '\\n',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    })
+
+    const fetchProcessData = new lambdanodejs.NodejsFunction(this, 'fetchData',{
       runtime: lambda.Runtime.NODEJS_14_X,
       environment: {
-        DELIVERYSTREAM_NAME: DeliveryStream.deliveryStreamName
+        DELIVERYSTREAM_NAME: coinCapDeliveryStream.deliveryStreamName!
       }
     })
 
