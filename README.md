@@ -2,7 +2,16 @@
 Cryptocurrency has been the hot topic of conversation the last few years, especially with the popularity and value of Bitcoin. In this project, I am combining my growing interest in cryptocurrency with aws by creating a small CDK centered around the public data source coincap.io.
 
 ## CoinCap data
-[CoinCap](https://docs.coincap.io/) is a tool for real-time pricing and general availability for cryptocurrencies. The REST api offers accurate data on various asset prices and availabilities. 
+[CoinCap](https://docs.coincap.io/) is a tool for real-time pricing and general availability for cryptocurrencies. The REST api offers accurate data on various asset prices and availabilities. The cap for requesting data is 500 requests per minute of one signs up for an API key which is fast and straight forward.
+
+## Infrastructure overview
+
+
+## Prerequisites
+* AWS account
+* AWS CDK 
+* AWS CLI installed and configured
+* Docker
 
 ## Useful commands
 
