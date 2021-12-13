@@ -6,6 +6,7 @@ import { CfnDeliveryStream } from '@aws-cdk/aws-kinesisfirehose'
 import * as iam from '@aws-cdk/aws-iam'
 import * as targets from '@aws-cdk/aws-events-targets'
 import * as events from '@aws-cdk/aws-events'
+import * as glue from '@aws-cdk/aws-glue'
 
 export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -117,6 +118,11 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       schedule: events.Schedule.cron({ minute: '/1' }),
     })
     eventRule.addTarget(new targets.LambdaFunction(fetchData))
+
+    // Raw Database
+    const rawDatabase = new glue.Database(this, 'SAPDatabase', {
+      databaseName: 'raw',
+    })
 
   }
 }
