@@ -60,11 +60,11 @@ const options = {
 export const handler = async(event: any) => {
   console.log('request:', JSON.stringify(event, undefined, 2))
   
-  var response
+  let response
   try {
     response = await getApiData(options)
     console.log('response:', response)
-  } catch(error) {
+  } catch (error) {
     console.error('Could not get data from API: ' + error)
     return
   }
@@ -78,11 +78,11 @@ export const handler = async(event: any) => {
     }
 
     return deliveryStream.putRecord(params).promise()
-    .then(() => {
-      console.log('Record written to stream')
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+      .then(() => {
+        console.log('Record written to stream')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   })
 }

@@ -117,13 +117,9 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     })
     eventRule.addTarget(new targets.LambdaFunction(fetchData))
 
-    const rawDatabase = new glue.Database(this, 'SAPDatabase', {
-      databaseName: 'raw',
-    })
-
     const rawdb = new glue.Database(this, 'coinCapRaw', {
       databaseName: 'coincapraw',
-    });
+    })
     
     const crawlerRole = new iam.Role(this, 'crawlerRole', {
       assumedBy: new iam.ServicePrincipal('glue.amazonaws.com'),
@@ -133,12 +129,12 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       ],
     })
 
-    const rawCrawler = new glue.CfnCrawler(this, "rawCrawler", {
+    const rawCrawler = new glue.CfnCrawler(this, 'rawCrawler', {
       targets: {
-        s3Targets: [{path: "s3://" + coinCapBucket.bucketName}]
+        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName }],
       },
       role: crawlerRole.roleArn,
-      databaseName: "coincapraw"
+      databaseName: 'coincapraw',
     })
 
     new glue.CfnTrigger(this, 'glueTrigger', {
@@ -146,7 +142,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       schedule: 'cron(*/15 * * * ? *)',
       type: 'SCHEDULED',
       actions: [{
-        crawlerName: 'rawCrawler-HfQuVh9toKnP'
+        crawlerName: 'rawCrawler-HfQuVh9toKnP',
       }],
       startOnCreation: true,
     })
