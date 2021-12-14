@@ -12,8 +12,8 @@ interface httpsoptions {
   protocol: string
 }
 
-interface coinCapResponseSigleId {
-  exchangeId: string
+interface coinCapResponseSigleAsset {
+  id: string
   rank: string
   symbol: string
   name: string
@@ -26,13 +26,13 @@ interface coinCapResponseSigleId {
   vwap24Hr: string
 }
 
-interface coinCapResponse {
-  data: coinCapResponseSigleId[]
+interface coinCapResponseAsset {
+  data: coinCapResponseSigleAsset[]
 }
 
 const deliveryStream = new aws.Firehose()
 
-const getApiData = async(options: httpsoptions): Promise<coinCapResponse> => {
+const getApiData = async(options: httpsoptions): Promise<coinCapResponseAsset> => {
   return new Promise((resolve) => {
     https.request(options, res => {
       // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -51,7 +51,7 @@ const getApiData = async(options: httpsoptions): Promise<coinCapResponse> => {
 const options = {
   protocol: 'https:',
   hostname: 'api.coincap.io',
-  path: '/v2/exchanges/',
+  path: '/v2/assets/',
   method: 'GET',
   headers: {
     'Authorization': 'Bearer 84688cf4-660a-4e90-8901-9a19dbee2621',

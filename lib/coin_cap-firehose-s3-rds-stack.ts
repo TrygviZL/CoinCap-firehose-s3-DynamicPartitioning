@@ -3,6 +3,7 @@ import * as s3 from '@aws-cdk/aws-s3'
 import * as iam from '@aws-cdk/aws-iam'
 import * as glue from '@aws-cdk/aws-glue'
 import { lamdbaFirehose } from './lambdaFirehose'
+import * as path from 'path'
 
 export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
   public readonly LamdbaFirehose: lamdbaFirehose

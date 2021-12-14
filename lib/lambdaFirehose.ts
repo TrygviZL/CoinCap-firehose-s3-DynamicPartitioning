@@ -10,6 +10,7 @@ import * as events from '@aws-cdk/aws-events'
 export interface lambdaFirehoseProps {
   readonly rawBucket: s3.IBucket
   readonly endpoint: string
+  readonly lambda: string
 }
 
 export class lamdbaFirehose extends cdk.Construct {
@@ -50,7 +51,7 @@ export class lamdbaFirehose extends cdk.Construct {
     // set jq statement which partitions data on s3
     let JQ = ''
     if (props.endpoint == 'assets') {
-      JQ = '{partition: .Id}'
+      JQ = '{partition: .id}'
     } else {
       JQ = '{partition: .exchangeId}'
     }
@@ -60,7 +61,7 @@ export class lamdbaFirehose extends cdk.Construct {
       extendedS3DestinationConfiguration: {
         bucketArn: props.rawBucket.bucketArn,
         roleArn: deliveryStreamRole.roleArn,
-        prefix: 'partition=!{partitionKeyFromQuery:partition}/!{timestamp:yyyy/MM/dd}/',
+        prefix: props.endpoint + '/partition=!{partitionKeyFromQuery:partition}/!{timestamp:yyyy/MM/dd}/',
         errorOutputPrefix: 'error/!{firehose:error-output-type}/',
         bufferingHints: {
           intervalInSeconds: 900,
@@ -117,7 +118,7 @@ export class lamdbaFirehose extends cdk.Construct {
   
     lambdaToFirehosePolicy.attachToRole(lambdaToFirehoseRole)
 
-    const fetchData = new lambdanodejs.NodejsFunction(this, 'fetchDataExchange', {
+    const fetchData = new lambdanodejs.NodejsFunction(this, props.lambda, {
       runtime: lambda.Runtime.NODEJS_14_X,
       environment: {
         // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
