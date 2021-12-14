@@ -2,10 +2,10 @@ import * as cdk from '@aws-cdk/core'
 import * as s3 from '@aws-cdk/aws-s3'
 import * as iam from '@aws-cdk/aws-iam'
 import * as glue from '@aws-cdk/aws-glue'
-import { lamdbaFirehoseCoin } from './lambdaFirehoseExchange'
+import { lamdbaFirehose } from './lambdaFirehose'
 
 export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
-  public readonly LamdbaFirehoseCoin: lamdbaFirehoseCoin
+  public readonly LamdbaFirehose: lamdbaFirehose
 
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
@@ -13,8 +13,10 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     const coinCapBucket = new s3.Bucket(this, 'coinCapBucket')
 
     // Construct which contains lambda, firehose and all permissions for these
-    new lamdbaFirehoseCoin(this, 'LamdbaFirehoseCoin', {
+    new lamdbaFirehose(this, 'LamdbaFirehose', {
       rawBucket: coinCapBucket,
+      endpoint: 'exchange',
+      lambda: 'fetchDataExchange',
     })
 
 
