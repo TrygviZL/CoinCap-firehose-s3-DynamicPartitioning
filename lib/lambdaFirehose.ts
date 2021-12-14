@@ -64,7 +64,7 @@ export class lamdbaFirehose extends cdk.Construct {
         prefix: props.endpoint + '/partition=!{partitionKeyFromQuery:partition}/!{timestamp:yyyy/MM/dd}/',
         errorOutputPrefix: 'error/!{firehose:error-output-type}/',
         bufferingHints: {
-          intervalInSeconds: 900,
+          intervalInSeconds: 60,
         },
         dynamicPartitioningConfiguration: {
           enabled: true,

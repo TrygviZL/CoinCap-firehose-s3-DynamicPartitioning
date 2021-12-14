@@ -14,12 +14,17 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     const coinCapBucket = new s3.Bucket(this, 'coinCapBucket')
 
     // Construct which contains lambda, firehose and all permissions for these
-    new lamdbaFirehose(this, 'LamdbaFirehose', {
+    new lamdbaFirehose(this, 'LamdbaFirehoseExchange', {
       rawBucket: coinCapBucket,
       endpoint: 'exchange',
       lambda: 'fetchDataExchange',
     })
 
+    new lamdbaFirehose(this, 'LamdbaFirehoseAssets', {
+      rawBucket: coinCapBucket,
+      endpoint: 'assets',
+      lambda: 'fetchDataAssets',
+    })
 
     const rawdb = new glue.Database(this, 'coinCapRaw', {
       databaseName: 'coincapraw',
@@ -33,20 +38,38 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
       ],
     })
 
-    const rawCrawler = new glue.CfnCrawler(this, 'rawCrawler', {
+    const rawCrawlerExchanges = new glue.CfnCrawler(this, 'rawCrawlerExchanges', {
       targets: {
-        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName }],
+        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName + '/exchanges/*' }],
       },
       role: crawlerRole.roleArn,
       databaseName: 'coincapraw',
+      name: 'rawCrawlerExchanges',
     })
-
-    new glue.CfnTrigger(this, 'glueTrigger', {
-      name: 'glueCrawlerTrigger',
+    new glue.CfnTrigger(this, 'glueTriggerExchanges', {
+      name: 'glueCrawlerTriggerExchanges',
       schedule: 'cron(*/15 * * * ? *)',
       type: 'SCHEDULED',
       actions: [{
-        crawlerName: 'rawCrawler-HfQuVh9toKnP',
+        crawlerName: rawCrawlerExchanges.name,
+      }],
+      startOnCreation: true,
+    })
+    
+    const rawCrawlerAssets = new glue.CfnCrawler(this, 'rawCrawlerAssets', {
+      targets: {
+        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName + '/assets/*' }],
+      },
+      role: crawlerRole.roleArn,
+      databaseName: 'coincapraw',
+      name: 'rawCrawlerAssets',
+    })
+    new glue.CfnTrigger(this, 'glueTriggerAssets', {
+      name: 'glueCrawlerTriggerAssets',
+      schedule: 'cron(*/15 * * * ? *)',
+      type: 'SCHEDULED',
+      actions: [{
+        crawlerName: rawCrawlerAssets.name,
       }],
       startOnCreation: true,
     })
