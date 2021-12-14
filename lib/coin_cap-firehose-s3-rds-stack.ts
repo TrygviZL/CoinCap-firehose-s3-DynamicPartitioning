@@ -1,11 +1,6 @@
 import * as cdk from '@aws-cdk/core'
 import * as s3 from '@aws-cdk/aws-s3'
-import * as lambdanodejs from '@aws-cdk/aws-lambda-nodejs'
-import * as lambda from '@aws-cdk/aws-lambda'
-import { CfnDeliveryStream } from '@aws-cdk/aws-kinesisfirehose'
 import * as iam from '@aws-cdk/aws-iam'
-import * as targets from '@aws-cdk/aws-events-targets'
-import * as events from '@aws-cdk/aws-events'
 import * as glue from '@aws-cdk/aws-glue'
 import { lamdbaFirehoseCoin } from './lambdaFirehoseExchange'
 
@@ -17,9 +12,11 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
 
     const coinCapBucket = new s3.Bucket(this, 'coinCapBucket')
 
-    new LamdbaFirehoseCoin(this, 'LamdbaFirehoseCoin', {
+    // Construct which contains lambda, firehose and all permissions for these
+    new lamdbaFirehoseCoin(this, 'LamdbaFirehoseCoin', {
       rawBucket: coinCapBucket,
     })
+
 
     const rawdb = new glue.Database(this, 'coinCapRaw', {
       databaseName: 'coincapraw',

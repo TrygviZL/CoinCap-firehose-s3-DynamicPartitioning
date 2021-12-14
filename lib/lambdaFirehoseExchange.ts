@@ -6,6 +6,7 @@ import * as lambda from '@aws-cdk/aws-lambda'
 import { CfnDeliveryStream } from '@aws-cdk/aws-kinesisfirehose'
 import * as targets from '@aws-cdk/aws-events-targets'
 import * as events from '@aws-cdk/aws-events'
+import * as path from 'path'
 
 export interface lambdaFirehoseCoinProps {
   readonly rawBucket: s3.IBucket
@@ -46,8 +47,8 @@ export class lamdbaFirehoseCoin extends cdk.Construct {
     
     deliveryStreamPolicy.attachToRole(deliveryStreamRole)
 
-    const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStream', {
-      deliveryStreamName: 'coinCapDeliveryStream',
+    const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStreamExchange', {
+      deliveryStreamName: 'coinCapDeliveryExchange',
       extendedS3DestinationConfiguration: {
         bucketArn: props.rawBucket.bucketArn,
         roleArn: deliveryStreamRole.roleArn,
@@ -107,9 +108,8 @@ export class lamdbaFirehoseCoin extends cdk.Construct {
     })
   
     lambdaToFirehosePolicy.attachToRole(lambdaToFirehoseRole)
-  
 
-    const fetchData = new lambdanodejs.NodejsFunction(this, 'fetchData', {
+    const fetchData = new lambdanodejs.NodejsFunction(this, 'fetchDataExchange', {
       runtime: lambda.Runtime.NODEJS_14_X,
       environment: {
         // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
