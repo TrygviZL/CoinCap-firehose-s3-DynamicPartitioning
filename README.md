@@ -8,7 +8,7 @@ Cryptocurrency has been the hot topic of conversation the last few years, especi
 The overall infrastructure is build on lambda, kinseis firehose and s3. 
 * Lambda functions fetch data from the API and writes it to firehose. A cron trigger is set to collect data every minute.
 * Data is buffered in Firehose for 15 minutes before objects are written to s3. In this project, I set Firehose to dynamically partition the data on s3 based on the ID of the incomming messages. This is primarily to improve query price an performance when using tools such as Quicksight and Athena.
-* Crawler
+* Crawlers are set to crawl the bucket every 15 minutes to keep the metadata fresh
 
 ![AWS architecture](https://github.com/TrygviZL/CoinCap-firehose-s3-rds/blob/main/static/infrastructure.png?raw=true)
 
