@@ -40,7 +40,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
 
     const rawCrawlerExchanges = new glue.CfnCrawler(this, 'rawCrawlerExchanges', {
       targets: {
-        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName + '/exchanges/*' }],
+        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName + '/exchange' }],
       },
       role: crawlerRole.roleArn,
       databaseName: 'coincapraw',
@@ -58,7 +58,7 @@ export class CoinCapFirehoseS3RdsStack extends cdk.Stack {
     
     const rawCrawlerAssets = new glue.CfnCrawler(this, 'rawCrawlerAssets', {
       targets: {
-        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName + '/assets/*' }],
+        s3Targets: [{ path: 's3://' + coinCapBucket.bucketName + '/assets' }],
       },
       role: crawlerRole.roleArn,
       databaseName: 'coincapraw',
