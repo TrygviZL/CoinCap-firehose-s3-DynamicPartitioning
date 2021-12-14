@@ -28,6 +28,7 @@ interface coinCapResponseSigleAsset {
 
 interface coinCapResponseAsset {
   data: coinCapResponseSigleAsset[]
+  timestamp: string
 }
 
 const deliveryStream = new aws.Firehose()
@@ -71,12 +72,16 @@ export const handler = async(event: any) => {
     return
   }
 
-  response.data.forEach(exchange => {
+  const timestamp = response.timestamp
+
+  response.data.forEach(asset => {
+
+    const data = { ...asset, timestamp }
     const params = {
       // eslint-disable-next-line  @typescript-eslint/no-non-null-assertion
       DeliveryStreamName: process.env.DELIVERYSTREAM_NAME!,
       Record: {
-        Data: JSON.stringify(exchange),
+        Data: JSON.stringify(data),
       },
     }
 
