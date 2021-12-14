@@ -6,16 +6,16 @@ import * as lambda from '@aws-cdk/aws-lambda'
 import { CfnDeliveryStream } from '@aws-cdk/aws-kinesisfirehose'
 import * as targets from '@aws-cdk/aws-events-targets'
 import * as events from '@aws-cdk/aws-events'
-import * as path from 'path'
 
-export interface lambdaFirehoseCoinProps {
+export interface lambdaFirehoseProps {
   readonly rawBucket: s3.IBucket
+  readonly endpoint: string
 }
 
-export class lamdbaFirehoseCoin extends cdk.Construct {
-  private props: lambdaFirehoseCoinProps
+export class lamdbaFirehose extends cdk.Construct {
+  private props: lambdaFirehoseProps
 
-  constructor(scope: cdk.Construct, id: string, props: lambdaFirehoseCoinProps) {
+  constructor(scope: cdk.Construct, id: string, props: lambdaFirehoseProps) {
     super(scope, id)
 
     this.props = props
@@ -47,12 +47,20 @@ export class lamdbaFirehoseCoin extends cdk.Construct {
     
     deliveryStreamPolicy.attachToRole(deliveryStreamRole)
 
-    const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStreamExchange', {
-      deliveryStreamName: 'coinCapDeliveryExchange',
+    // set jq statement which partitions data on s3
+    let JQ = ''
+    if (props.endpoint == 'assets') {
+      JQ = '{partition: .Id}'
+    } else {
+      JQ = '{partition: .exchangeId}'
+    }
+
+    const coinCapDeliveryStream = new CfnDeliveryStream(this, 'coinCapDeliveryStream' + props.endpoint, {
+      deliveryStreamName: 'coinCapDelivery' + props.endpoint,
       extendedS3DestinationConfiguration: {
         bucketArn: props.rawBucket.bucketArn,
         roleArn: deliveryStreamRole.roleArn,
-        prefix: 'exchange=!{partitionKeyFromQuery:exchange}/!{timestamp:yyyy/MM/dd}/',
+        prefix: 'partition=!{partitionKeyFromQuery:partition}/!{timestamp:yyyy/MM/dd}/',
         errorOutputPrefix: 'error/!{firehose:error-output-type}/',
         bufferingHints: {
           intervalInSeconds: 900,
@@ -68,7 +76,7 @@ export class lamdbaFirehoseCoin extends cdk.Construct {
               parameters: [
                 {
                   parameterName: 'MetadataExtractionQuery',
-                  parameterValue: '{exchange: .exchangeId}',
+                  parameterValue: JQ,
                 },
                 {
                   parameterName: 'JsonParsingEngine',
