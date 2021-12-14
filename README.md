@@ -6,7 +6,7 @@ Cryptocurrency has been the hot topic of conversation the last few years, especi
 
 ## Infrastructure overview
 
-![AWS architecture](https://github.com/TrygviZL/CoinCap-firehose-s3-rds/blob/main/static/infrastructure_transparent.png?raw=true)
+![AWS architecture](https://github.com/TrygviZL/CoinCap-firehose-s3-rds/blob/main/static/infrastructure.png?raw=true)
 
 ## Prerequisites
 * AWS account
