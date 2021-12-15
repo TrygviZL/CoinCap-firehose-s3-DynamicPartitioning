@@ -10,7 +10,7 @@ The overall infrastructure is build on lambda, kinseis firehose and s3.
 * Data is buffered in Firehose for 15 minutes before objects are written to s3. In this project, I set Firehose to dynamically partition the data on s3 based on the ID of the incomming messages. This is primarily to improve query price an performance when using tools such as Quicksight and Athena.
 * Crawlers are set to crawl the bucket every 15 minutes to keep the metadata fresh
 
-![AWS architecture](/static/infrastructure.png)
+![AWS architecture](https://raw.githubusercontent.com/TrygviZL/CoinCap-firehose-s3-rds/main/static/dashboard.png)
 
 ## Quicksight Dashboard
 To visualize the data, I set up an account in the AWS BI tool Quicksight. It is convenient in that it is easy to access data on s3 through athena and supports custom queries to do small transformations on the fly along with typecastings. 
