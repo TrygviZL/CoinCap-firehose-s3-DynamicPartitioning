@@ -12,8 +12,6 @@ The overall infrastructure is build on lambda, kinseis firehose and s3.
 
 ![AWS architecture](static/infrastructure.png?raw=true)
 
-<img src="https://github.com/TrygviZL/CoinCap-firehose-s3-rds/blob/main/static/infrastructure.png?raw=true" alt="GCMovie list table" style="max-width:100%;" >
-
 ## Quicksight Dashboard
 To visualize the data, I set up an account in the AWS BI tool Quicksight. It is convenient in that it is easy to access data on s3 through athena and supports custom queries to do small transformations on the fly along with typecastings. 
 The dashboard consists of an overview table, a barchart and a linechart. The table displays an overview of the various cryptocurrencies with stats such as ranking, supply, price and percent change last 24 hours. The linechart shows the time-series for all the currencies while the barchart shows the distribution of these in the time-span. By clicking on a currency on the table, one can filter by that specific currency which also applies to the line- and barcharts.
